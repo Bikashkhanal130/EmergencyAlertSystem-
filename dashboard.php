@@ -15,7 +15,7 @@
     <script src="https://unpkg.com/leaflet/dist/leaflet.js" integrity="sha384-dzEI2F3q3dP0+taUqcjLstP6pysIq11LLhcrjZ+XnctFv2bHpbeqFKRz4gpOe2/l" crossorigin=""></script>
 
     <!-- CSS -->
-    <link rel="stylesheet" href="../header/dashboard.cssS">
+    <link rel="stylesheet" href="./dashboard.css">
     <!-- Iconscout CSS -->
     <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
 
@@ -83,66 +83,34 @@
         </div>
     </section>
 
+<script src="./dashboard.js"></script>
     <script>
-    console.log("Script loaded successfully!");
+console.log("Script loaded successfully!");
 
-    const body = document.querySelector("body"),
-        modeToggle = body.querySelector(".mode-toggle");
-    sidebar = body.querySelector("nav");
-    sidebarToggle = body.querySelector(".sidebar-toggle");
+// Call getUserLocation when the Help Me button is clicked
+const helpButton = document.getElementById('helpButton');
+console.log("Help button:", helpButton);
+helpButton.addEventListener('click', getUserLocation);
 
-    sidebarToggle.addEventListener("click", () => {
-        sidebar.classList.toggle("close");
-        if(sidebar.classList.contains("close")){
-            localStorage.setItem("status", "close");
-        } else {
-            localStorage.setItem("status", "open");
+// Function to get user's location and display alert
+async function getUserLocation() {
+    console.log("Getting user location...");
+    if (navigator.geolocation) {
+        try {
+            const position = await navigator.geolocation.getCurrentPosition();
+            const { latitude, longitude } = position.coords;
+            console.log("User location obtained:", latitude, longitude);
+            // Show notification
+            alert("Your location is: Latitude " + latitude + ", Longitude " + longitude);
+        } catch (error) {
+            console.error('Error getting user location:', error);
         }
-    });
-
-    // Initialize Leaflet map
-    var mymap = L.map('map').setView([51.505, -0.09], 13); // Set initial view to London
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(mymap);
-
-    // Add a marker to represent your location
-    var marker = L.marker([51.5, -0.09]).addTo(mymap); // Default location is London
-    marker.bindPopup("<b>You are here!</b>").openPopup(); // Popup message
-
-    // Replace the default location with user's location obtained through geolocation
-    // Make sure to update the marker's position and map's view when user's location is obtained
-    function updateUserLocation(lat, lng) {
-        console.log("Updating user location:", lat, lng);
-        marker.setLatLng([lat, lng]).update(); // Update marker position
-        mymap.setView([lat, lng], 13); // Update map view
+    } else {
+        console.error("Geolocation is not supported by this browser.");
     }
-
-    // Function to get user's location and update map
-    async function getUserLocation() {
-        console.log("Getting user location...");
-        if (navigator.geolocation) {
-            try {
-                const position = await navigator.geolocation.getCurrentPosition();
-                const { latitude, longitude } = position.coords;
-                console.log("User location obtained:", latitude, longitude);
-                updateUserLocation(latitude, longitude);
-            } catch (error) {
-                console.error('Error getting user location:', error);
-            }
-        } else {
-            console.error("Geolocation is not supported by this browser.");
-        }
-    }
-
-    // Call getUserLocation when the Help Me button is clicked
-    const helpButton = document.getElementById('helpButton');
-    console.log("Help button:", helpButton);
-    helpButton.addEventListener('click', getUserLocation);
+}
 </script>
 
-    <script src="../header/dashboard.js"></script>
+ 
 </body>
 </html>
