@@ -1,0 +1,124 @@
+/* Reset CSS */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+}
+
+/* Navigation */
+nav {
+    background-color: #333;
+    color: #fff;
+    height: 100vh;
+    width: 250px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    overflow-y: auto;
+    transition: width 0.3s ease;
+}
+
+.logo-name {
+    padding: 20px;
+    text-align: center;
+}
+
+.logo_name {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.menu-items {
+    padding-top: 20px;
+}
+
+.nav-links {
+    list-style: none;
+    padding: 0;
+}
+
+.nav-links li {
+    margin-bottom: 10px;
+}
+
+.nav-links a {
+    display: block;
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 20px;
+    transition: background-color 0.3s ease;
+}
+
+.nav-links a:hover {
+    background-color: #555;
+}
+
+.logout-mode {
+    position: absolute;
+    bottom: 30px;
+    width: 100%;
+    text-align: center;
+}
+
+.logout-mode .logout {
+    display: block;
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 0;
+    /* float: left; */
+    margin-left: -28px;
+}
+
+/* Dashboard Content */
+.dashboard {
+    margin-left: 250px; /* Adjust based on nav width */
+    padding: 20px;
+}
+
+.sidebar-toggle {
+    display: none;
+}
+
+@media screen and (max-width: 768px) {
+    nav {
+        width: 80px;
+    }
+
+    .logo_name {
+        display: none;
+    }
+
+    .menu-items {
+        display: none;
+    }
+
+    .logout-mode {
+        position: fixed;
+        bottom: 0;
+        width: 60px;
+        text-align: center;
+        float: left;
+    }
+
+    .dashboard {
+        margin-left: 80px;
+    }
+
+    .sidebar-toggle {
+        display: block;
+        cursor: pointer;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 24px;
+    }
+
+    .close .sidebar-toggle {
+        transform: rotate(180deg);
+    }
+}
