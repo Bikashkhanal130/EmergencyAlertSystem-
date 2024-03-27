@@ -50,20 +50,20 @@
             </ul>
         </div>
     </nav>
-
     <section class="dashboard">
-        <div class="top">
-            <i class="uil uil-bars sidebar-toggle"></i>
+    <div class="dash-content">
+        <div id="emergency-content" class="hidden"> 
+
+        <div class="btn-danger">
+    <button id="helpButton" class="btn btn-danger">Help Me</button>
+</div>
+
+         
+            <form id="emergency-response-form"> 
+                </form>
         </div>
-        <div class="dash-content">
-            <div class="overview">
-                <div class="title">
-                    <i class="uil uil-tachometer-fast-alt"></i>
-                    <span class="text">Emergency Alert Dashboard</span>
-                </div>
-            </div>
-        </div>
-    </section>
+    </div>
+</section>
 
     <script>
         const body = document.querySelector("body"),
@@ -79,6 +79,8 @@
                 localStorage.setItem("status", "open");
             }
         });
-    </script>
+
+</script>
+<script src="dashboard.js"></script>
 </body>
 </html>
