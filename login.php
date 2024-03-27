@@ -3,12 +3,13 @@ session_start();
 
 // Check if the user is already logged in, if yes, redirect to dashboard or home page
 if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
-    header("location: dashboard.php");
+    header('Location: dashboard.php');
     exit;
 }
 
 // Include database configuration
-require_once "config.php";
+// require_once "config.php";
+include "config.php";
 
 // Initialize variables
 $email = $password = "";
@@ -32,7 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Validate credentials
     if (empty($email_err) && empty($password_err)) {
         // Prepare a select statement
-        $sql = "SELECT id, email, password FROM users WHERE email = :email";
+        $sql = "SELECT email, password FROM users WHERE email = :email";
 
         if ($stmt = $pdo->prepare($sql)) {
             // Bind variables to the prepared statement as parameters
@@ -43,8 +44,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             // Attempt to execute the prepared statement
             if ($stmt->execute()) {
-                // Check if email exists, if yes then verify password
+                // Check if email exists
                 if ($stmt->rowCount() == 1) {
+                    // Fetch user data
                     if ($row = $stmt->fetch()) {
                         $id = $row["id"];
                         $email = $row["email"];
@@ -52,17 +54,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         if (password_verify($password, $hashed_password)) {
                             // Password is correct, start a new session
                             session_start();
-
+            
                             // Store data in session variables
                             $_SESSION["loggedin"] = true;
                             $_SESSION["id"] = $id;
                             $_SESSION["email"] = $email;
-
-                            // Redirect user to dashboard or home page
-                            header("location: dashboard.php");
+            
+                            // Redirect user to dashboard
+                            header('Location: dashboard.php');
+                            exit; // Make sure to exit after redirection
                         } else {
-                            // Password is not valid, display a generic error message
-                            $login_err = "Invalid email or password.";
+                            // Password is not valid, redirect back to login page
+                            header("Location: login.php");
+                            exit; // Make sure to exit after redirection
                         }
                     }
                 } else {
@@ -72,7 +76,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             } else {
                 echo "Oops! Something went wrong. Please try again later.";
             }
-
             // Close statement
             unset($stmt);
         }
@@ -116,4 +119,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 </body>
 
+<script src="./login_register.js"></script>
 </html>
