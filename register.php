@@ -1,30 +1,32 @@
 <?php
-include 'config.php'; // Include your database connection file
+include 'config.php';
+
+header("location: index.php");
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  $name = $_POST["name"];
-  $email = $_POST["email"];
-  $password = $_POST["password"];
-
-  // Password hashing (important for security!)
-  $hashed_password = password_hash($password, PASSWORD_DEFAULT); 
-
-  // Build the insertion query
-  $sql = "INSERT INTO users (name, email, password) VALUES (?, ?, ?)";
-  $stmt = $conn->prepare($sql);
-  $stmt->bind_param("sss", $name, $email, $hashed_password);
-
-  if ($stmt->execute()) {
-    echo "Registration successful!";
-    // Redirect to login or a success page
-  } else {
-    echo "Error during registration: " . $conn->error;
-  }
-
-  $stmt->close();
-  $conn->close();
+    $name = $_POST["name"];
+    $email = $_POST["email"];
+    $password = $_POST["password"];
+    
+    // Password hashing
+    $hashed_password = password_hash($password, PASSWORD_DEFAULT); 
+    
+    // Build the insertion query
+    $sql = "INSERT INTO users (name, email, password) VALUES (?, ?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("sss", $name, $email, $hashed_password);
+    
+    if ($stmt->execute()) {
+        echo "Registration successful!";
+    } else {
+        echo "Error during registration: " . $conn->error;
+    }
+    
+    $stmt->close();
+    $conn->close();
 }
 ?>
+
 
 
 <!DOCTYPE html>

@@ -2,36 +2,30 @@
 include 'config.php'; // Include your database connection file
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // $name = $_POST["name"];
+    // Login logic will be handled here
     $email = $_POST["email"];
     $password = $_POST["password"];
-    $confirm_password = $_POST["confirm_password"];
-
-    // Validate if passwords match
-    if ($password !== $confirm_password) {
-        echo "Passwords do not match.";
-        exit(); // Stop further execution
-    }
-
-    // Password hashing (important for security!)
-    $hashed_password = password_hash($password, PASSWORD_DEFAULT); 
-
-    // Build the insertion query
-    $sql = "INSERT INTO users (name, email, password) VALUES (?, ?, ?)";
+    
+    // Retrieve user data from the database
+    $sql = "SELECT * FROM users WHERE email = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sss", $name, $email, $hashed_password);
-
-    if ($stmt->execute()) {
-        // Redirect to dashboard after successful registration
-        header("Location: dashboard.php");
-        exit(); // Stop further execution
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result->num_rows == 1) {
+        $row = $result->fetch_assoc();
+        if (password_verify($password, $row["password"])) {
+            // Redirect to dashboard or success page
+            header("location: dashboard.php");
+            exit();
+        } else {
+            echo "Invalid email or password!";
+        }
     } else {
-        // Log the error instead of echoing to the page
-        error_log("Error during registration: " . $conn->error);
-        // Display a user-friendly message
-        echo "An error occurred during registration. Please try again later.";
+        echo "Invalid email or password!";
     }
-
+    
     $stmt->close();
     $conn->close();
 }
@@ -49,7 +43,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body>
   <div class="container" id="container">
     <div class="form-container sign-up-container">
-      <form action="register.php" method="POST"> 
+      <form action="index.php" method="POST"> <!-- Changed action to index.php -->
         <h1>Create Account</h1>
         <div class="social-container">
           <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
@@ -60,12 +54,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <input type="text" name="name" placeholder="Name" required />
         <input type="email" name="email" placeholder="Email" required />
         <input type="password" name="password" placeholder="Password" required />
-        <input type="password" name="confirm_password" placeholder="Confirm Password" required />
-        <button type="submit" name="register">Sign Up</button>
+        <!-- Removed confirm_password input -->
+        <button type="submit" name="register">Sign Up</button> <!-- Added name attribute -->
       </form>
     </div>
     <div class="form-container sign-in-container">
-      <form action="login.php" method="POST">
+      <form action="dashboard.php" method="POST">
         <h1>Sign in</h1>
         <div class="social-container">
           <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
@@ -76,7 +70,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <input type="email" name="email" placeholder="Email" required />
         <input type="password" name="password" placeholder="Password" required />
         <a href="#">Forgot your password?</a>
-        <button type="submit" name="login">Sign In</button>
+        <button type="submit" name="login">Sign In</button> <!-- Added name attribute -->
       </form>
     </div>
     <div class="overlay-container">
