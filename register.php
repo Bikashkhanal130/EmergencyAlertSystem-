@@ -3,7 +3,8 @@ include 'config.php';
 
 header("location: index.php");
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["register"])) {
     $name = $_POST["name"];
     $email = $_POST["email"];
     $password = $_POST["password"];

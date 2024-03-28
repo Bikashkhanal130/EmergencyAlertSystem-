@@ -1,34 +1,34 @@
 <?php
 include 'config.php'; // Include your database connection file
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Login logic will be handled here
-    $email = $_POST["email"];
-    $password = $_POST["password"];
-    
-    // Retrieve user data from the database
-    $sql = "SELECT * FROM users WHERE email = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    
-    if ($result->num_rows == 1) {
-        $row = $result->fetch_assoc();
-        if (password_verify($password, $row["password"])) {
-            // Redirect to dashboard or success page
-            header("location: dashboard.php");
-            exit();
-        } else {
-            echo "Invalid email or password!";
-        }
-    } else {
-        echo "Invalid email or password!";
-    }
-    
-    $stmt->close();
-    $conn->close();
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["login"])) {
+  $email = $_POST["email"];
+  $password = $_POST["password"];
+  
+  // Retrieve user data from the database
+  $sql = "SELECT * FROM users WHERE email = ?";
+  $stmt = $conn->prepare($sql);
+  $stmt->bind_param("s", $email);
+  $stmt->execute();
+  $result = $stmt->get_result();
+  
+  if ($result->num_rows == 1) {
+      $row = $result->fetch_assoc();
+      if (password_verify($password, $row["password"])) {
+          // Redirect to dashboard or success page
+          header("location: dashboard.php");
+          exit();
+      } else {
+          echo "Invalid email or password!";
+      }
+  } else {
+      echo "Invalid email or password!";
+  }
+  
+  $stmt->close();
 }
+
+$conn->close(); // Close the database connection
 ?>
 
 
@@ -39,6 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login / Register</title>
   <link rel="stylesheet" href="login.css"> 
+  <script src="https://kit.fontawesome.com/d62b10e8dc.js" crossorigin="anonymous"></script>
 </head>
 <body>
   <div class="container" id="container">
