@@ -1,123 +1,105 @@
 <?php
-session_start();
+include 'config.php'; // Include your database connection file
 
-// Check if the user is already logged in, if yes, redirect to dashboard or home page
-if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
-    header('Location: dashboard.php');
-    exit;
-}
-
-// Include database configuration
-// require_once "config.php";
-include "config.php";
-
-// Initialize variables
-$email = $password = "";
-$email_err = $password_err = $login_err = "";
-
-// Processing form data when form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Check if email and password are empty
-    if (empty(trim($_POST["email"]))) {
-        $email_err = "Please enter email.";
+    // $name = $_POST["name"];
+    $email = $_POST["email"];
+    $password = $_POST["password"];
+    $confirm_password = $_POST["confirm_password"];
+
+    // Validate if passwords match
+    if ($password !== $confirm_password) {
+        echo "Passwords do not match.";
+        exit(); // Stop further execution
+    }
+
+    // Password hashing (important for security!)
+    $hashed_password = password_hash($password, PASSWORD_DEFAULT); 
+
+    // Build the insertion query
+    $sql = "INSERT INTO users (name, email, password) VALUES (?, ?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("sss", $name, $email, $hashed_password);
+
+    if ($stmt->execute()) {
+        // Redirect to dashboard after successful registration
+        header("Location: dashboard.php");
+        exit(); // Stop further execution
     } else {
-        $email = trim($_POST["email"]);
+        // Log the error instead of echoing to the page
+        error_log("Error during registration: " . $conn->error);
+        // Display a user-friendly message
+        echo "An error occurred during registration. Please try again later.";
     }
 
-    if (empty(trim($_POST["password"]))) {
-        $password_err = "Please enter your password.";
-    } else {
-        $password = trim($_POST["password"]);
-    }
-
-    // Validate credentials
-    if (empty($email_err) && empty($password_err)) {
-        // Prepare a select statement
-        $sql = "SELECT email, password FROM users WHERE email = :email";
-
-        if ($stmt = $pdo->prepare($sql)) {
-            // Bind variables to the prepared statement as parameters
-            $stmt->bindParam(":email", $param_email, PDO::PARAM_STR);
-
-            // Set parameters
-            $param_email = $email;
-
-            // Attempt to execute the prepared statement
-            if ($stmt->execute()) {
-                // Check if email exists
-                if ($stmt->rowCount() == 1) {
-                    // Fetch user data
-                    if ($row = $stmt->fetch()) {
-                        $id = $row["id"];
-                        $email = $row["email"];
-                        $hashed_password = $row["password"];
-                        if (password_verify($password, $hashed_password)) {
-                            // Password is correct, start a new session
-                            session_start();
-            
-                            // Store data in session variables
-                            $_SESSION["loggedin"] = true;
-                            $_SESSION["id"] = $id;
-                            $_SESSION["email"] = $email;
-            
-                            // Redirect user to dashboard
-                            header('Location: dashboard.php');
-                            exit; // Make sure to exit after redirection
-                        } else {
-                            // Password is not valid, redirect back to login page
-                            header("Location: login.php");
-                            exit; // Make sure to exit after redirection
-                        }
-                    }
-                } else {
-                    // Email doesn't exist, display a generic error message
-                    $login_err = "Invalid email or password.";
-                }
-            } else {
-                echo "Oops! Something went wrong. Please try again later.";
-            }
-            // Close statement
-            unset($stmt);
-        }
-    }
-
-    // Close connection
-    unset($pdo);
+    $stmt->close();
+    $conn->close();
 }
 ?>
 
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <title>Login - Neighbour Emergency Alert System</title>
-    <link rel="stylesheet" href="login.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login / Register</title>
+  <link rel="stylesheet" href="login.css"> 
 </head>
-
 <body>
-    <div class="wrapper">
-        <h2>Login</h2>
-        <p>Please fill in your credentials to login.</p>
-        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-            <div class="form-group <?php echo (!empty($email_err)) ? 'has-error' : ''; ?>">
-                <label>Email</label>
-                <input type="email" name="email" class="form-control" value="<?php echo $email; ?>">
-                <span class="help-block"><?php echo $email_err; ?></span>
-            </div>
-            <div class="form-group <?php echo (!empty($password_err)) ? 'has-error' : ''; ?>">
-                <label>Password</label>
-                <input type="password" name="password" class="form-control">
-                <span class="help-block"><?php echo $password_err; ?></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" class="btn" value="Login">
-            </div>
-            <p>Don't have an account? <a href="register.php">Sign up now</a>.</p>
-            <p><?php echo $login_err; ?></p>
-        </form>
+  <div class="container" id="container">
+    <div class="form-container sign-up-container">
+      <form action="register.php" method="POST"> 
+        <h1>Create Account</h1>
+        <div class="social-container">
+          <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
+          <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
+        </div>
+        <span>or use your email for registration</span>
+        <input type="text" name="name" placeholder="Name" required />
+        <input type="email" name="email" placeholder="Email" required />
+        <input type="password" name="password" placeholder="Password" required />
+        <input type="password" name="confirm_password" placeholder="Confirm Password" required />
+        <button type="submit" name="register">Sign Up</button>
+      </form>
     </div>
-</body>
+    <div class="form-container sign-in-container">
+      <form action="login.php" method="POST">
+        <h1>Sign in</h1>
+        <div class="social-container">
+          <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
+          <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
+        </div>
+        <span>or use your account</span>
+        <input type="email" name="email" placeholder="Email" required />
+        <input type="password" name="password" placeholder="Password" required />
+        <a href="#">Forgot your password?</a>
+        <button type="submit" name="login">Sign In</button>
+      </form>
+    </div>
+    <div class="overlay-container">
+      <div class="overlay">
+        <div class="overlay-panel overlay-left">
+          <h1>Welcome Back!</h1>
+          <p>To stay connected, please login with your personal info</p>
+          <button class="ghost" id="signIn">Sign In</button>
+        </div>
+        <div class="overlay-panel overlay-right">
+          <h1>Hello, Friend!</h1>
+          <p>Enter your details to begin your journey with us</p>
+          <button class="ghost" id="signUp">Sign Up</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-<script src="./login_register.js"></script>
+  <footer>
+      <p>Created with <i class="fa fa-heart"></i> by Me
+      </p>
+  </footer>
+
+  <script src="login.js"></script> 
+</body>
 </html>

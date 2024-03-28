@@ -30,5 +30,6 @@
     <p>&copy; 2024 Neighborhood Emergency Alert System. All rights reserved.</p>
 </footer>
 
+<script src="./login.js"></script>
 </body>
 </html>

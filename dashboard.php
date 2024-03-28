@@ -1,4 +1,9 @@
+<?php 
 
+include 'config.php';
+
+// header('Location: dashboard.php');
+?>
 
 
 <!DOCTYPE html>
